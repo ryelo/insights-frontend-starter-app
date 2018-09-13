@@ -1,17 +1,12 @@
-[![Build Status](https://travis-ci.org/RedHatInsights/insights-frontend-starter-app.svg?branch=master)](https://travis-ci.org/RedHatInsights/insights-frontend-starter-app)
+# ryelo/react-starter-app
 
-# insights-frontend-starter-app
-
-React.js starter app for Red Hat Insights products that includes Patternfly 3 and Patternfly Next.
+React.js starter app which was originally created for Red Hat Insights. This is the abstracted version that does not rely on any of the other features.
 
 ## Getting Started
 
-There is a [comprehensive quick start guide in the Storybook Documentation](https://github.com/RedHatInsights/insights-frontend-storybook/blob/master/src/docs/welcome/quickStart/DOC.md) to setting up an Insights environment complete with:
+You must be using a version of Node >7.0
 
-- Insights Frontend Starter App
-
-- [Insights Chroming](https://github.com/RedHatInsights/insights-chrome)
-- [Insights Proxy](https://github.com/RedHatInsights/insights-proxy)
+`git clone git@github.com:ryelo/react-starter-app.git`
 
 Note: You will need to set up the Insights environment if you want to develop with the starter app due to the consumption of the chroming service as well as setting up your global/app navigation through the API.
 
@@ -22,31 +17,12 @@ Note: You will need to set up the Insights environment if you want to develop wi
 2. ```npm run start```
     - starts webpack bundler and serves the files with webpack dev server
 
+3. Navigate to `localhost:8002`
+
 ### Testing
 
 - Travis is used to test the build for this code.
   - `npm run test` will run linters and tests
-
-## Deploying
-
-- The Platform team is using Travis to deploy the application
-  - The Platform team will help you set up the Travis instance if this is the route you are wanting to take
-
-### How it works
-
-- any push to the `{REPO}` `master` branch will deploy to a `{REPO}-build` `master` branch
-- any push to a `{REPO}` `stable/*` branch will deploy to a `{REPO}-build` `stable` branch
-- Pull requests (based on master) will not be pushed to `{REPO}-build` `master` branch
-  - If the PR is accepted and merged, master will be rebuilt and will deploy to `{REPO}-build` `master` branch
-
-## Patternfly
-
-- This project imports Patternfly components:
-  - [Patternfly React](https://github.com/patternfly/patternfly-react)
-
-## Insights Components
-
-Insights Platform will deliver components and static assets through [npm](https://www.npmjs.com/package/@red-hat-insights/insights-frontend-components). ESI tags are used to import the [chroming](https://github.com/RedHatInsights/insights-chrome) which takes care of the header, sidebar, and footer.
 
 ## Technologies
 
@@ -131,6 +107,164 @@ This file exports an object with the configuration for webpack and webpack dev s
     - State Updates are Merged
 
 ### Redux
+
+#### Middleware listener
+
+Because there are places where creating new reducer is too robust and might lead to wrong state mutation there is middleware which can create listeners on redux actions. Anytime new action is triggered it looks trough this set of listeners and calls callbacks.
+
+##### Usage of middleware listener
+
+```js
+import { applyMiddleware } from 'redux';
+import { MiddlewareListener } from '@red-hat-insights/insights-frontend-components';
+const listenerMiddleware = new MiddlewareListener();
+this.store = createStore(
+    reducers,
+    initState,
+    applyMiddleware(listenerMiddleware.getMiddleware())
+);
+```
+
+After creating such listener middleware you can simply call `addNew` method with type over which you want to listen and callback that is called when such action is called on redux.
+
+addNew params:
+
+- on - type of action to listen to
+- callback - function that is called when action is triggered
+
+Callback params:
+
+- data - payload from action
+- preventBubble - function to prevent bubbling of such redux event. New event is triggered with type `@@config/action-stopped` and payload as action that was stopped.
+
+```js
+const removeListener = listenerMiddleware.addNew({on: 'someType', (event) => event.preventBubble()})
+```
+
+Please clean after yourself by calling function which is returned from `listenerMiddleware`.
+
+### Reducer registry
+
+To enable registering reducers on the fly you may use reducer registry. There are also helper functions to help you improve your work with redux.
+
+#### Registry decorator
+
+To use registry out of the box without some kind of coding we provide simple decorator
+(you'd have to install coresponding babel [plugin](http://babeljs.io/docs/en/babel-plugin-transform-decorators) and enable decorators).
+
+- First you have to initialize such registry by calling `getStoreFromRegistry` with initial state and some middlewares
+
+(both attributes are optional).
+
+```JSX
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { getStoreFromRegistry } from '@red-hat-insights/insights-frontend-components';
+import promiseMiddleware from 'redux-promise-middleware';
+import App from './App';
+
+ReactDOM.render(
+    <Provider store={getStoreFromRegistry({}, [promiseMiddleware()])}>
+        <Router basename='/insights/platform/inventory'>
+            <App />
+        </Router>
+    </Provider>,
+    document.getElementById('root')
+);
+
+```
+
+*Then you can use this decorator anywhere you want and you can access registry by calling `this.registry`.
+
+ ```JSX
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { registry as registryDecorator } from 'path/to/Utilities';
+
+//We'll bind registry to this class
+@registryDecorator()
+class SomeClass extends Component {
+
+    componentDidMount () {
+        //we'll register new reducer over here
+        this.registry.register({
+            someKey: (state, action) => ({...state})
+        })
+    }
+
+    render () {
+        return (
+        <div>
+            Hello world
+        </div>
+        );
+    }
+}
+
+export default connect()(App);
+```
+
+#### Usage of reducer registry
+
+Simply create new instance of reducer registry, you may wish to supply some parameters while creating new store so you 
+can change behaviour of your state.
+
+Parameters:
+
+- `initState` - default to empty object
+- `middlewares` - default to empty array
+- `composeEnhancers` - default to `compose` from redux library
+
+```javascript
+import { ReducerRegistry } from 'path/to/Utilities';
+import { middlewares } from './middlewareSettings';
+
+const reduxRegistry = new ReducerRegistry(initState, middlewares);
+```
+
+Available methods:
+
+- `getStore` - to dispatch or to read state of store
+- `register` - to add multiple reducers
+
+#### Helper function
+
+##### `applyReducerHash`
+
+If you don't like switch statements in your reducers you may use object literals, this function will map such object to
+reducer
+
+```js
+const SOME_ACTION = 'some-action';
+function reducerFunction(state, action) {
+    return {
+        ...state,
+        someProps: action.payload
+    };
+}
+
+const customReducer = applyReducerHash({
+    [SOME_ACTION]: reducerFunction
+})
+```
+
+Later you can assign this `customReducer` to change the store by calling `register` function.
+
+##### `dispatchActionsToStore`
+
+If application has some actions which needs to be dispatched over multiple stores or they can't be connected via `redux-redux` it's convenient to use this function.
+
+It's as easy as calling dispatchActionsToStore with multiple actions (either trough object or array) and store over which you want to dispatch these functions.
+
+```js
+import * as actions from './actions';
+import store from './singleton-store';
+import { dispatchActionsToStore } from 'path/to/store';
+
+export default dispatchActionsToStore(actions, store);
+```
 
 #### Store
 
