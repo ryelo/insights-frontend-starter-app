@@ -18,6 +18,7 @@ import React, { Component } from 'react';
  *
  * @returns {AsyncComponent} The imported component or can return a loading
  */
+
 export default function asyncComponent(importComponent) {
     class AsyncComponent extends Component {
         constructor(props) {

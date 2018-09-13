@@ -1,7 +1,5 @@
-@import '~@red-hat-insights/insights-frontend-components/Utilities/_all';
-
+// Sample Component Styles
 .sample-component {
-  font-size: $ins-fontSize;
-  margin: $ins-margin;
-  display: block;
+  font-size: 20px;
+  color: blue;
 }

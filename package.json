@@ -2,6 +2,14 @@
   "name": "insights-frontend-starter-app",
   "version": "1.1.0",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryelo/react-starter-app.git"
+  },
+  "author": "ryelo",
+  "bugs": {
+    "url": "https://github.com/ryelo/react-starter-app/issues"
+  },
   "dependencies": {
     "@patternfly/patternfly-next": "^1.0.41",
     "@patternfly/react-core": "1.11.0",

@@ -4,41 +4,25 @@ import React from 'react';
 import asyncComponent from './Utilities/asyncComponent';
 import some from 'lodash/some';
 
-/**
- * Aysnc imports of components
- *
- * https://webpack.js.org/guides/code-splitting/
- * https://reactjs.org/docs/code-splitting.html
- *
- * pros:
- *      1) code splitting
- *      2) can be used in server-side rendering
- * cons:
- *      1) nameing chunk names adds unnecessary docs to code,
- *         see the difference with DashboardMap and InventoryDeployments.
- *
- */
 const SamplePage = asyncComponent(() => import(/* webpackChunkName: "SamplePage" */ './SmartComponents/SamplePage/SamplePage'));
-const Rules = asyncComponent(() => import(/* webpackChunkName: "Rules" */ './PresentationalComponents/Rules/ListRules'));
 const paths = {
-    samplepage: '/samplepage',
-    rules: '/rules'
+    samplepage: '/samplepage'
 };
 
 type Props = {
     childProps: any
 };
 
-const InsightsRoute = ({ component: Component, rootClass, ...rest }) => {
+const SweetRoute = ({ component: Component, rootClass, ...rest }) => {
     const root = document.getElementById('root');
     root.removeAttribute('class');
-    root.classList.add(`page__${rootClass}`, 'pf-l-page__main');
+    root.classList.add(`page__${rootClass}`);
     root.setAttribute('role', 'main');
 
     return (<Component {...rest} />);
 };
 
-InsightsRoute.propTypes = {
+SweetRoute.propTypes = {
     component: PropTypes.func,
     rootClass: PropTypes.string
 };
@@ -56,9 +40,7 @@ export const Routes = (props: Props) => {
 
     return (
         <Switch>
-            <InsightsRoute path={paths.samplepage} component={SamplePage} rootClass='samplepage' />
-            <InsightsRoute path={paths.rules} component={Rules} rootClass='rules' />
-
+            <SweetRoute path={paths.samplepage} component={SamplePage} rootClass='samplepage' />
             {/* Finally, catch all unmatched routes */}
             <Route render={() => some(paths, p => p === path) ? null : (<Redirect to={paths.samplepage} />)} />
         </Switch>

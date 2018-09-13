@@ -17,10 +17,7 @@ const SampleComponent = (props) => {
 SampleComponent.displayName = 'SampleComponent';
 
 SampleComponent.propTypes = {
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ])
+    children: PropTypes.node
 };
 
 export default SampleComponent;
