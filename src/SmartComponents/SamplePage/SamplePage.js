@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import asyncComponent from '../../Utilities/asyncComponent';
-import './sample-page.scss';
+import './styles.scss';
 
-const SampleComponent = asyncComponent(() => import('../../PresentationalComponents/SampleComponent/SampleComponent'));
+const Content = asyncComponent(() => import('../../PresentationalComponents/Content/Content'));
 
 /**
  * A smart component that handles all the api calls and data needed by the dumb components.
@@ -17,7 +17,10 @@ class SamplePage extends Component {
 
     render() {
         return (
-            <SampleComponent> Sample Component </SampleComponent>
+            <React.Fragment>
+                <Content type='title'> Sample Title </Content>
+                <Content> Sample Component </Content>
+            </React.Fragment>
         );
     }
 }
