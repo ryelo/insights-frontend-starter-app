@@ -4,11 +4,9 @@ React.js starter app which was originally created for Red Hat Insights. This is 
 
 ## Getting Started
 
-You must be using a version of Node >7.0
+You must be using a version of `Node > 7.0`
 
 `git clone git@github.com:ryelo/react-starter-app.git`
-
-Note: You will need to set up the Insights environment if you want to develop with the starter app due to the consumption of the chroming service as well as setting up your global/app navigation through the API.
 
 ## Build app
 
