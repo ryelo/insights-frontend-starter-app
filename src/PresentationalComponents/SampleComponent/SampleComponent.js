@@ -1,22 +1,37 @@
-import './sample-component.scss';
-import PropTypes from 'prop-types';
+// Import React Library
 import React from 'react';
+import PropTypes from 'prop-types';
+
+// Import Other Libraries
+import classNames from 'classnames';
+
+// Import Styles
+import './styles.scss';
 
 /**
- * This is a dumb component that only recieves properties from a smart component.
- * Dumb components are usually functions and not classes.
- *
- * @param props the props given by the smart component.
+ * This is an example component to serve as a template
  */
-const SampleComponent = (props) => {
+
+const SampleComponent = ({ className, children, props}) => {
+
+    // Allow uses to pass their own classes as well as our own
+    let sampleClasses = classNames(
+        'sampleClass',
+        className
+    );
+
     return (
-        <span className='sample-component'> {props.children} </span>
+
+        // Spread props so users can prop drill
+        <span className={ sampleClasses } { ...props }> { children } </span>
     );
 };
 
+// Actually name the component for easier tracking
 SampleComponent.displayName = 'SampleComponent';
 
 SampleComponent.propTypes = {
+    // allow user to pass anything and everything
     children: PropTypes.node
 };
 

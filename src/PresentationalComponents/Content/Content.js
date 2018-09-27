@@ -1,27 +1,40 @@
-import PropTypes from 'prop-types';
+// Import React Library
 import React from 'react';
+import PropTypes from 'prop-types';
 
+// Import Other Libraries
+import classNames from 'classnames';
+
+// Import Styles
 import './styles.scss';
+
 /**
- * This is a dumb component that only recieves properties from a smart component.
- * Dumb components are usually functions and not classes.
- *
- * @param props the props given by the smart component.
+ * This is a component that conditionally renders content based on the type
  */
-const Content = ({ type, children, props }) => {
 
-    let renderType;
+const Content = ({ type, className, children, props }) => {
 
-    if (type === 'text') {
-        renderType = <span { ...props } className='content-text'> { children } </span>;
-    } else {
-        renderType = <h1 { ...props } className='content-title'> { children } </h1>;
+    // Allow uses to pass their own classes as well as our own
+    let contentClasses = classNames(
+        [`content-${type}`],
+        className
+    );
+
+    // Conditionally render based on type
+    let renderContent;
+    switch (type) {
+        case 'text':
+            return renderContent = <span { ...props } className={ contentClasses }> { children } </span>;
+        case 'title':
+            return renderContent = <h1 { ...props } className={ contentClasses }> { children } </h1>;
+        case 'code':
+            return renderContent = <code { ...props } className={ contentClasses }> { children } </code>;
     }
 
     ;
 
     return (
-        <React.Fragment> { renderType } </React.Fragment>
+        <React.Fragment> { renderContent } </React.Fragment>
     );
 };
 
@@ -29,7 +42,8 @@ Content.displayName = 'Content';
 
 Content.propTypes = {
     children: PropTypes.node,
-    type: PropTypes.oneOf(['text', 'title'])
+    // The type has to be either text, title, or code
+    type: PropTypes.oneOf(['text', 'title', 'code']).isRequired
 };
 
 Content.defaultProps = {

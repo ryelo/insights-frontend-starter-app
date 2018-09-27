@@ -4,9 +4,9 @@ import React from 'react';
 import asyncComponent from './Utilities/asyncComponent';
 import some from 'lodash/some';
 
-const SamplePage = asyncComponent(() => import(/* webpackChunkName: "SamplePage" */ './SmartComponents/SamplePage/SamplePage'));
+const SampleRouter = asyncComponent(() => import(/* webpackChunkName: "SamplePage" */ './SmartComponents/SamplePages/SampleRouter'));
 const paths = {
-    samplepage: '/samplepage'
+    sample: '/sample'
 };
 
 type Props = {
@@ -40,9 +40,9 @@ export const Routes = (props: Props) => {
 
     return (
         <Switch>
-            <SweetRoute path={paths.samplepage} component={SamplePage} rootClass='samplepage' />
+            <SweetRoute path={paths.sample} component={SampleRouter} rootClass='sample' />
             {/* Finally, catch all unmatched routes */}
-            <Route render={() => some(paths, p => p === path) ? null : (<Redirect to={paths.samplepage} />)} />
+            <Route render={() => some(paths, p => p === path) ? null : (<Redirect to={paths.sample} />)} />
         </Switch>
     );
 };
