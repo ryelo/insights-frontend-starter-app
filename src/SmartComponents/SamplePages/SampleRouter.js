@@ -1,5 +1,10 @@
+// Import React Library
 import React from 'react';
+
+// Routers
 import { withRouter, Route, Switch } from 'react-router-dom';
+
+// Other Libraries
 import asyncComponent from '../../Utilities/asyncComponent';
 
 const FirstPage = asyncComponent(() => import(/* webpackChunkName: "FirstPage" */ './FirstPage'));
